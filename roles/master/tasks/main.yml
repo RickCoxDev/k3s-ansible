@@ -71,7 +71,7 @@
     
 - name: Get Kubeconfig from Master Node
   fetch:
-    src: "{{ home_directory.stdout }}/.kube/config
+    src: "{{ home_directory.stdout }}/.kube/config"
     dest: kubeconfig/
     flat: yes
 
