@@ -86,16 +86,17 @@
       {{ groups['master'][0] }}:6443 
       --discovery-token-ca-cert-hash sha256:{{ hash.stdout }}
 
-# TODO: Make logic to switch between Weave and Flannel based on variable
 - name: Install Weave Net
+  when: net == "weave"
   shell:
     cmd: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
   environment:
     KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
 
-# - name: Install Flannel
-#   ignore_errors: yes
-#   shell: 
-#     cmd: curl -sSL https://rawgit.com/coreos/flannel/master/Documentation/kube-flannel.yml | sed "s/amd64/arm/g" | kubectl create -f -
-#   environment:
-#     KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
+- name: Install Flannel
+  when: net == "flannel"
+  ignore_errors: yes
+  shell: 
+    cmd: curl -sSL https://rawgit.com/coreos/flannel/master/Documentation/kube-flannel.yml | sed "s/amd64/arm/g" | kubectl create -f -
+  environment:
+    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"

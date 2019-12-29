@@ -1,9 +1,28 @@
 - hosts: all
+  vars_prompt:
+    - name: timezone
+      prompt: What timezone do you want to use?
+      private: no
+      default: America/Chicago
+      
+    - name: net
+      prompt: Do you want to use Weave Net or Flannel? (weave, flannel)
+      private: no
+      default: weave
   roles:
     - common
 - hosts: master
+  vars_prompt:
+    - name: dashboard.enabled
+      prompt: Would you like to enable kubernetes dashboard?
+      private: no
+      default: no
   roles:
     - master
 - hosts: all:!master
   roles:
     - worker
+- hosts: master
+  when: dashboard.enabled == true
+  roles:
+    - dashboard

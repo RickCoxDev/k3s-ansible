@@ -69,8 +69,8 @@
     name: dphys-swapfile.service
     enabled: no
 
-# TODO: Trigger this task only when Weave is selected
 - name: Switch to iptables legacy
+  when: net == "weave"
   shell:
     cmd: |
       update-alternatives --set iptables /usr/sbin/iptables-legacy
