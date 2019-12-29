@@ -1,0 +1,53 @@
+---
+- name: "Reset Kubernetes"
+  ignore_errors: yes
+  shell: 
+    cmd: kubeadm reset -f
+
+- name: "Remove docker images" 
+  shell: 
+    cmd: echo $(docker rmi --force $(docker images --all -q) && echo 'true')
+
+- name: "Get Home Directory"
+  register: home_directory
+  shell:
+    cmd: "getent passwd {{ ansible_user }}  | awk -F: '{ print $6 }'"
+
+- name: Remove kubectl config files
+  when: "'master' in group_names"
+  file:
+    path: "{{ home_directory.stdout }}/.kube"
+    state: absent
+
+- name: Remove CNI files
+  file:
+    path: /etc/cni/net.d
+    state: absent
+
+- name: "apt-get purge packages"
+  notify: reboot
+  apt:
+    name: 
+      - kubelet
+      - kubeadm
+      - kubectl
+      - docker-ce
+    state: absent
+    purge: yes
+    autoremove: yes
+    force: yes
+
+- name: "apt-get update"
+  apt:
+    update_cache: yes
+    autoclean: yes
+    autoremove: yes
+
+- name: Flush iptables rules
+  iptables:
+    flush: yes
+
+- name: "Remove pod logging"
+  file: 
+    path: /var/log/pods/
+    state: absent

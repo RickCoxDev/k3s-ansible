@@ -1,0 +1,99 @@
+# TODO: Fail playbook if options.json is not used
+- name: "set timezone to {{ timezone }}"
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Determine if docker is installed
+  stat:
+    path: /usr/bin/docker
+  register: docker
+  ignore_errors: yes
+
+# TODO: Install Docker version 19.03.5
+- name: Download Docker Install Script
+  get_url:
+    url: https://get.docker.com
+    dest: ./docker.sh
+    mode: 777
+  when: docker.stat.exists == False
+
+- name: Run Docker Install Script
+  shell:
+    cmd: ./docker.sh
+  when: docker.stat.exists == False
+
+- name: Clean Up Docker Script
+  file:
+    path: ./docker.sh
+    state: absent
+  when: docker.stat.exists == False
+
+- name: Adding pi user to docker group
+  user:
+    name: pi
+    append: yes
+    groups: docker
+
+- name: Enabling cgroup options at boot
+  notify: reboot
+  copy:
+    src: cmdline.txt
+    dest: /boot/cmdline.txt
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Pass bridged IPv4 traffic to iptables' chains
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: '1'
+    state: present
+
+- name: Update /etc/hostname
+  notify: reboot
+  copy:
+    dest: /etc/hostname
+    content: "{{inventory_hostname}}"
+    mode: preserve
+
+- name: Update /etc/hosts
+  notify: reboot
+  replace:
+    path: /etc/hosts
+    regexp: ^127\.0\.1\.1.*$
+    replace: "127.0.1.1       {{inventory_hostname}}"
+
+- name: Disable swap
+  notify: reboot
+  systemd:
+    name: dphys-swapfile.service
+    enabled: no
+
+# TODO: Trigger this task only when Weave is selected
+- name: Switch to iptables legacy
+  shell:
+    cmd: |
+      update-alternatives --set iptables /usr/sbin/iptables-legacy
+      update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+      update-alternatives --set ebtables /usr/sbin/ebtables-legacy
+  
+- name: Update Kernel
+  notify: reboot
+  command:
+    cmd: rpi-update
+
+- name: Add Kubernetes Repo
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    update_cache: no
+
+- name: Add Kubernetes Repo Key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+# TODO: Install kubeadm version 1.17
+- name: Install kubeadm
+  apt:
+    name: kubeadm
+    update_cache: yes
+    force_apt_get: yes

@@ -1,0 +1,101 @@
+- name: Pull Images
+  command: 
+    cmd: kubeadm config images pull -v3
+
+- name: Reset Kubernetes Master
+  command: 
+    cmd: kubeadm reset -f
+
+- name: Generate Kube token
+  register: token
+  command:
+    cmd: kubeadm token generate
+
+- name: Get Public IP Address
+  register: ip_address
+  ipify_facts:
+    timeout: 20
+
+- name: Initiate kubeadm
+  block:
+    - debug: 
+        msg: "WARNING: The following step can take a long time. Up to 15 minutes"
+    - register: kubeadm_init
+      command: 
+        cmd: >
+          kubeadm init
+          --pod-network-cidr=10.32.0.0/12
+          --apiserver-advertise-address={{ ansible_default_ipv4.address }}
+          --ignore-preflight-errors=all 
+          --token-ttl=0 --token {{ token.stdout }}
+          --control-plane-endpoint {{ ip_address.ansible_facts.ipify_public_ip }}
+  rescue:
+    - when: "'timed out waiting for the condition' in kubeadm_init.stdout"
+      debug: 
+        msg: Operation timed out. Increasing Kubernetes failureThreshold and Retrying
+    - lineinfile:
+        path: /etc/kubernetes/manifests/kube-apiserver.yaml
+        line: '\g<1>failureThreshold: 20'
+        regex: '^(\s+)failureThreshold'
+    - command: 
+        cmd: >
+          kubeadm init
+          --pod-network-cidr=10.32.0.0/12
+          --apiserver-advertise-address={{ ansible_default_ipv4.address }}
+          --ignore-preflight-errors=all
+          --token-ttl=0 --token {{ token.stdout }}
+          --control-plane-endpoint {{ ip_address.ansible_facts.ipify_public_ip }}
+
+- name: Get {{ ansible_user }} Home Directory
+  register: home_directory
+  shell:
+    cmd: "getent passwd {{ ansible_user }}  | awk -F: '{ print $6 }'"
+
+- name: Create Kube Config Folder
+  file:
+    path: "{{ home_directory.stdout }}/.kube"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0755
+    state: directory
+    recurse: yes
+
+- name: Copy admin.conf to config directory
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ home_directory.stdout }}/.kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0755
+    remote_src: yes
+
+- name: Get Kube Hash
+  register: hash
+  shell:
+    cmd: >
+      openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt |
+      openssl rsa -pubin -outform der 2>/dev/null |
+      openssl dgst -sha256 -hex |
+      sed 's/^.* //'
+
+- name: Join Kube Cluster
+  command:
+    cmd: > 
+      kubeadm join --ignore-preflight-errors=all
+      --token {{ token.stdout }} 
+      {{ groups['master'][0] }}:6443 
+      --discovery-token-ca-cert-hash sha256:{{ hash.stdout }}
+
+# TODO: Make logic to switch between Weave and Flannel based on variable
+- name: Install Weave Net
+  shell:
+    cmd: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+  environment:
+    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
+
+# - name: Install Flannel
+#   ignore_errors: yes
+#   shell: 
+#     cmd: curl -sSL https://rawgit.com/coreos/flannel/master/Documentation/kube-flannel.yml | sed "s/amd64/arm/g" | kubectl create -f -
+#   environment:
+#     KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"

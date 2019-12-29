@@ -1,0 +1,4 @@
+# TODO: Create steps to install and setup kubernetes dashboard
+# TODO: Create step to print access instructions
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep {{ username }} | awk '{print $1}')

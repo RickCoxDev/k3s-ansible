@@ -1,0 +1,12 @@
+{
+  "clusterName": "kubernetes",
+  "timezone": "America/Chicago",
+  "net": "weave",
+  "dashboard": {
+    "enabled": true,
+    "username": ""
+  },
+  "storage": {
+    "path": "/mnt"
+  }
+}
