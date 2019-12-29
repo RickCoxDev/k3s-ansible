@@ -1,4 +1,15 @@
-# TODO: Create steps to install and setup kubernetes dashboard
 # TODO: Create step to print access instructions
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
-kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep {{ username }} | awk '{print $1}')
+- name: Install Kubernetes Dashboard
+  command:
+    cmd: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+
+- name: Copy Dashboard spec file
+  template:
+    src: files/dashboard.yml
+    dest: ~/dashboard.yml
+    
+- name: Create Dashboard User
+  command:
+    cmd: kubectl create -f ~/dashboard.yml
+
+# kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep {{ username }} | awk '{print $1}')

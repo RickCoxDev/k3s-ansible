@@ -4,7 +4,7 @@
   "net": "weave",
   "dashboard": {
     "enabled": true,
-    "username": ""
+    "username": "admin"
   },
   "storage": {
     "path": "/mnt"
