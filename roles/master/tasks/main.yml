@@ -68,6 +68,12 @@
     group: "{{ ansible_user }}"
     mode: 0755
     remote_src: yes
+    
+- name: Get Kubeconfig from Master Node
+  fetch:
+    src: "{{ home_directory.stdout }}/.kube/config
+    dest: kubeconfig/
+    flat: yes
 
 - name: Get Kube Hash
   register: hash

@@ -2,3 +2,5 @@
 !.cache/.gitkeep
 .log/*
 !.log/.gitkeep
+kubeconfig/*
+!kubeconfig/.gitkeep
