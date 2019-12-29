@@ -6,10 +6,15 @@
 - name: Copy Dashboard spec file
   template:
     src: files/dashboard.yml
-    dest: ~/dashboard.yml
+    dest: "{{ hostvars[groups['master'][0]].home_directory.stdout }}/dashboard.yml"
     
 - name: Create Dashboard User
   command:
-    cmd: kubectl create -f ~/dashboard.yml
+    cmd: "kubectl create -f {{ hostvars[groups['master'][0]].home_directory.stdout }}/dashboard.yml"
+    
+- name: Clean up spec File
+  file:
+    path: "{{ hostvars[groups['master'][0]].home_directory.stdout }}/dashboard.yml"
+    state: absent
 
 # kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep {{ username }} | awk '{print $1}')

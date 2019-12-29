@@ -24,5 +24,10 @@
     - worker
 - hosts: master
   when: dashboard.enabled == true
+  vars_prompt:
+    - name: dashboard.username
+      prompt: What username do you want to use for the kubernetes dashboard?
+      private: no
+      default: admin
   roles:
     - dashboard
