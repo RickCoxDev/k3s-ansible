@@ -1,4 +1,6 @@
-# TODO: Fail playbook if options.json is not used
+- set_fact:
+    net: "{{ net }}"
+
 - name: "set timezone to {{ timezone }}"
   timezone:
     name: "{{ timezone }}"
@@ -78,7 +80,6 @@
       update-alternatives --set ebtables /usr/sbin/ebtables-legacy
   
 - name: Update Kernel
-  notify: reboot
   command:
     cmd: rpi-update
 

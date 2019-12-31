@@ -1,20 +1,29 @@
+- name: Get {{ ansible_user }} Home Directory
+  register: home_directory
+  shell:
+    cmd: "getent passwd {{ ansible_user }}  | awk -F: '{ print $6 }'"
+
 # TODO: Create step to print access instructions
-- name: Install Kubernetes Dashboard
-  command:
-    cmd: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+# - name: Install Kubernetes Dashboard
+#   command:
+#     cmd: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+#   environment:
+#     KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
 
 - name: Copy Dashboard spec file
   template:
-    src: files/dashboard.yml
-    dest: "{{ hostvars[groups['master'][0]].home_directory.stdout }}/dashboard.yml"
+    src: user.yml.j2
+    dest: "{{ home_directory.stdout }}/dashboard.yml"
     
 - name: Create Dashboard User
   command:
-    cmd: "kubectl create -f {{ hostvars[groups['master'][0]].home_directory.stdout }}/dashboard.yml"
+    cmd: "kubectl create -f {{ home_directory.stdout }}/dashboard.yml"
+  environment:
+    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
     
-- name: Clean up spec File
-  file:
-    path: "{{ hostvars[groups['master'][0]].home_directory.stdout }}/dashboard.yml"
-    state: absent
+# - name: Clean up spec File
+#   file:
+#     path: "{{ home_directory.stdout }}/dashboard.yml"
+#     state: absent
 
 # kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep {{ username }} | awk '{print $1}')
