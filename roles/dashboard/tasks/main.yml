@@ -4,11 +4,11 @@
     cmd: "getent passwd {{ ansible_user }}  | awk -F: '{ print $6 }'"
 
 # TODO: Create step to print access instructions
-# - name: Install Kubernetes Dashboard
-#   command:
-#     cmd: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
-#   environment:
-#     KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
+- name: Install Kubernetes Dashboard
+  command:
+    cmd: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+  environment:
+    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
 
 - name: Copy Dashboard spec file
   template:
@@ -21,9 +21,22 @@
   environment:
     KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
     
-# - name: Clean up spec File
-#   file:
-#     path: "{{ home_directory.stdout }}/dashboard.yml"
-#     state: absent
+- name: Clean up spec File
+  file:
+    path: "{{ home_directory.stdout }}/dashboard.yml"
+    state: absent
 
-# kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep {{ username }} | awk '{print $1}')
+- name: Get User Token
+  register: token
+  shell:
+    cmd: "kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep {{ username }} | awk '{print $1}') | awk '/^token/{print $2}'"
+  environment:
+    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
+
+- name: Instructions
+  debug:
+    msg:
+      - "Setup kubectl with the config file in the kubeconfig folder"
+      - "Enter the command kubectl proxy in your command line"
+      - "Go to the following url in your browser: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login"
+      - "Enter the following token in the login screen: '{{ token.stdout }}'"
