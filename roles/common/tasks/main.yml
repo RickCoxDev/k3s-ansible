@@ -88,9 +88,14 @@
   apt_key:
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
-# TODO: Install kubeadm version 1.17
-- name: Install kubeadm and Update
+- name: Install kubeadm
   apt:
-    name: kubeadm
+    name: kubeadm=1.17.0-00
     update_cache: yes
-    upgrade: dist
+
+- name: Update kernel
+  notify: reboot
+  register: kernel
+  changed_when: '"reboot" in kernel.stdout'
+  shell:
+    cmd: echo y | rpi-update
