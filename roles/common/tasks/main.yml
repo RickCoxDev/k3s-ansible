@@ -92,10 +92,3 @@
   apt:
     name: kubeadm=1.17.0-00
     update_cache: yes
-
-- name: Update kernel
-  notify: reboot
-  register: kernel
-  changed_when: '"reboot" in kernel.stdout'
-  shell:
-    cmd: echo y | rpi-update
