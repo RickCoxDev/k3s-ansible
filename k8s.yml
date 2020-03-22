@@ -10,10 +10,10 @@
       private: no
       default: weave
   roles:
-    - common
+    - k8s-common
 - hosts: master
   roles:
-    - master
+    - k8s-master
 - hosts: all:!master
   roles:
-    - worker
+    - k8s-worker
