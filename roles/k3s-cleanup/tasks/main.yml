@@ -1,0 +1,6 @@
+- name: Uninstall K3s for Master Node
+  when: hostvars[inventory_hostname].group_names[0] == 'master'
+  command: /usr/local/bin/k3s-uninstall.sh
+- name: Uninstall K3s for Worker Node
+  when: hostvars[inventory_hostname].group_names[0] != 'master'
+  command: /usr/local/bin/k3s-agent-uninstall.sh

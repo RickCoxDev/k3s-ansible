@@ -1,0 +1,14 @@
+- hosts: all
+  vars_prompt:
+    - name: timezone
+      prompt: What timezone do you want to use?
+      private: no
+      default: America/Chicago
+  roles:
+    - k3s-common
+- hosts: master
+  roles:
+    - k3s-master
+- hosts: all:!master
+  roles:
+    - k3s-worker

@@ -1,0 +1,29 @@
+- name: Get Public IP Address
+  register: ip_address
+  ipify_facts:
+    timeout: 20
+- name: Install k3s as master node
+  shell: curl -sfL https://get.k3s.io | sh -s - server --tls-san {{ ip_address.ansible_facts.ipify_public_ip }}
+  environment:
+    K3S_KUBECONFIG_MODE: "644"
+- name: Get k3s Token
+  register: token
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+- name: Get Kubeconfig from Master Node
+  fetch:
+    src: "/etc/rancher/k3s/k3s.yaml"
+    dest: kubeconfig/
+    flat: yes
+- name: Get {{ ansible_user }} Home Directory
+  register: home_directory
+  shell:
+    cmd: "getent passwd {{ ansible_user }}  | awk -F: '{ print $6 }'"
+- name: Move Kubeconfig to User's Directory
+  copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ home_directory.stdout }}/.kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0755
+    remote_src: yes
