@@ -8,7 +8,7 @@
   command:
     cmd: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
   environment:
-    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
+    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config/k3s.yaml"
 
 - name: Copy Dashboard spec file
   template:
@@ -19,7 +19,7 @@
   command:
     cmd: "kubectl create -f {{ home_directory.stdout }}/dashboard.yml"
   environment:
-    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
+    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config/k3s.yaml"
     
 - name: Clean up spec File
   file:
@@ -31,7 +31,7 @@
   shell:
     cmd: "kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep {{ username }} | awk '{print $1}') | awk '/^token/{print $2}'"
   environment:
-    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config"
+    KUBECONFIG: "{{ home_directory.stdout }}/.kube/config/k3s.yaml"
 
 - name: Instructions
   debug:

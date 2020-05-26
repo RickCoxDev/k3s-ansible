@@ -1,0 +1,1 @@
+options: "{{ '--disable coredns ' if not coredns else '' }}{{ '--disable servicelb ' if not servicelb else '' }}{{ '--disable traefik ' if not traefik else '' }}{{ '--disable local-storage ' if not local_storage else '' }}{{ '--disable metrics-server ' if not metrics_server else '' }}"

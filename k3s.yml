@@ -7,6 +7,27 @@
   roles:
     - k3s-common
 - hosts: master
+  vars_prompt:
+    - name: coredns
+      prompt: Would you like to install coredns?
+      private: no
+      default: yes
+    - name: servicelb
+      prompt: Would you like to install servicelb?
+      private: no
+      default: yes
+    - name: traefik
+      prompt: Would you like to install traefik?
+      private: no
+      default: yes
+    - name: local_storage
+      prompt: Would you like to install local-storage?
+      private: no
+      default: yes
+    - name: metrics_server
+      prompt: Would you like to install metrics-server?
+      private: no
+      default: yes
   roles:
     - k3s-master
 - hosts: all:!master
