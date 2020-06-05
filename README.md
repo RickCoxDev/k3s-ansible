@@ -29,7 +29,13 @@ The inventory file is pretty self explanitory. What ever host names you set in t
 | dashboard.yml   | Install Kubernetes Dashboard |
 
 ### K3s
-As a part of installing K3s [Traefik](https://docs.traefik.io/) and a Loadbalancer is added to the cluster. In the future I will add support to allow you to update the traefik config as a part of installing k3s.
+As a part of installing K3s there are a number of modules that are [installed](https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/#kubernetes-components).
+- coredns
+- servicelb
+- traefik,local-storage
+- metrics-server
+
+The K3s playbook will prompt you on what components you don't want installed. By default they are all installed. In the future I will add support to allow you to update the traefik config as a part of installing k3s.
 
 ### K8s
 When running the K8s installation playbook you are prompted whether to install [Weave](https://www.weave.works/docs/net/latest/overview/) or [Flannel](https://github.com/coreos/flannel) to use are your network between the nodes.
