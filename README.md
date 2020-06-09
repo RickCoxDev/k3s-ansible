@@ -32,7 +32,8 @@ The inventory file is pretty self explanitory. What ever host names you set in t
 As a part of installing K3s there are a number of modules that are [installed](https://rancher.com/docs/k3s/latest/en/installation/install-options/server-config/#kubernetes-components).
 - coredns
 - servicelb
-- traefik,local-storage
+- traefik
+- local-storage
 - metrics-server
 
 The K3s playbook will prompt you on what components you don't want installed. By default they are all installed. In the future I will add support to allow you to update the traefik config as a part of installing k3s.
