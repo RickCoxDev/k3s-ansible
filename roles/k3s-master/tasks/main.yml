@@ -3,14 +3,22 @@
   ipify_facts:
     timeout: 20
 - name: Install k3s as master node
-  shell: curl -sfL https://get.k3s.io | sh -s - server {{ options }}--tls-san {{ ip_address.ansible_facts.ipify_public_ip }}
+  when: groups['master'][0] == inventory_hostname
+  shell: curl -sfL https://get.k3s.io | sh -s - server --cluster-init {{ options }}--tls-san {{ ip_address.ansible_facts.ipify_public_ip }}
   environment:
     K3S_KUBECONFIG_MODE: "644"
 - name: Get k3s Token
+  when: groups['master'][0] == inventory_hostname
   register: token
   slurp:
     src: /var/lib/rancher/k3s/server/node-token
+- name: Install k3s on other master nodes
+  when: groups['master'][0] != inventory_hostname
+  shell: curl -sfL https://get.k3s.io | sh -s - server --server http://{{ groups['master'][0] }}:6443
+  environment:
+    K3S_TOKEN: "{{ token }}"
 - name: Get Kubeconfig from Master Node
+  when: groups['master'][0] == inventory_hostname
   fetch:
     src: "/etc/rancher/k3s/k3s.yaml"
     dest: kubeconfig/
