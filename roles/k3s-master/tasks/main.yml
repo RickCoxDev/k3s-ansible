@@ -14,9 +14,10 @@
     src: /var/lib/rancher/k3s/server/node-token
 - name: Install k3s on other master nodes
   when: groups['master'][0] != inventory_hostname
-  shell: curl -sfL https://get.k3s.io | sh -s - server --server http://{{ groups['master'][0] }}:6443
+  shell: curl -sfL https://get.k3s.io | sh -s - server --server https://{{ hostvars[groups['master'][0]]['ansible_default_ipv4'].address }}:6443
+  ignore_errors: True
   environment:
-    K3S_TOKEN: "{{ token }}"
+    K3S_TOKEN: "{{ hostvars[groups['master'][0]].token.content | b64decode | replace('\n', '') }}"
 - name: Get Kubeconfig from Master Node
   when: groups['master'][0] == inventory_hostname
   fetch:

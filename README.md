@@ -39,4 +39,4 @@ As a part of installing K3s there are a number of modules that are [installed](h
 The K3s playbook will prompt you on what components you don't want installed. By default they are all installed. In the future I will add support to allow you to update the traefik config as a part of installing k3s.
 
 ### K8s
-When running the K8s installation playbook you are prompted whether to install [Weave](https://www.weave.works/docs/net/latest/overview/) or [Flannel](https://github.com/coreos/flannel) to use are your network between the nodes.
+When running the K8s installation playbook you are prompted whether to install [Weave](https://www.weave.works/docs/net/latest/overview/) or [Flannel](https://github.com/coreos/flannel) to use as your network between the nodes.
