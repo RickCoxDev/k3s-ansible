@@ -7,7 +7,13 @@
   roles:
     - k3s-common
 - hosts: master
+  vars_files:
+    - ./database.yml
   vars_prompt:
+    - name: externaldatabase
+      prompt: Would you like to use an external database?
+      private: no
+      default: no
     - name: coredns
       prompt: Would you like to install coredns?
       private: no

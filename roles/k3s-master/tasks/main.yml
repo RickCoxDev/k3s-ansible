@@ -4,7 +4,7 @@
     timeout: 20
 - name: Install k3s as master node
   when: groups['master'][0] == inventory_hostname
-  shell: curl -sfL https://get.k3s.io | sh -s - server --cluster-init {{ options }}--tls-san {{ ip_address.ansible_facts.ipify_public_ip }}
+  shell: curl -sfL https://get.k3s.io | sh -s - server {{ '--cluster-init ' if groups['master'] | length > 1 else '' }}{{ options }}--tls-san {{ ip_address.ansible_facts.ipify_public_ip }}
   environment:
     K3S_KUBECONFIG_MODE: "644"
 - name: Get k3s Token
@@ -14,7 +14,7 @@
     src: /var/lib/rancher/k3s/server/node-token
 - name: Install k3s on other master nodes
   when: groups['master'][0] != inventory_hostname
-  shell: curl -sfL https://get.k3s.io | sh -s - server --server https://{{ hostvars[groups['master'][0]]['ansible_default_ipv4'].address }}:6443
+  shell: curl -sfL https://get.k3s.io | sh -s - server {{ options }}--server https://{{ hostvars[groups['master'][0]]['ansible_default_ipv4'].address }}:6443
   ignore_errors: True
   environment:
     K3S_TOKEN: "{{ hostvars[groups['master'][0]].token.content | b64decode | replace('\n', '') }}"
