@@ -1,7 +1,8 @@
-.cache/*
+.cache/
 !.cache/.gitkeep
-.log/*
+.log/
 !.log/.gitkeep
-kubeconfig/*
+kubeconfig/
 !kubeconfig/.gitkeep
 venv/
+roles/xanmanning.k3s/
