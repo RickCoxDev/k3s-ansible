@@ -1,0 +1,10 @@
+---
+k3s_kubeconfig_context_name: raspi
+k3s_release_version: "v1.18.9+k3s1"
+k3s_no_flannel: false
+k3s_no_coredns: false
+k3s_no_traefik: true
+k3s_no_servicelb: true
+k3s_no_local_storage: true
+k3s_no_metrics_server: true
+k3s_become_for_all: true

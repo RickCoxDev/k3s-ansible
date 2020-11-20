@@ -1,39 +1,45 @@
-- hosts: all
-  vars_prompt:
-    - name: timezone
-      prompt: What timezone do you want to use?
-      private: no
-      default: America/Chicago
+# - hosts: all
+#   vars_prompt:
+#     - name: timezone
+#       prompt: What timezone do you want to use?
+#       private: no
+#       default: America/Chicago
+#   roles:
+#     - k3s-common
+- hosts:
+    - master
+    - worker
   roles:
-    - k3s-common
-- hosts: master
-  vars_prompt:
-    - name: externaldatabase
-      prompt: Would you like to use an external database?
-      private: no
-      default: no
-    - name: coredns
-      prompt: Would you like to install coredns?
-      private: no
-      default: yes
-    - name: servicelb
-      prompt: Would you like to install servicelb?
-      private: no
-      default: yes
-    - name: traefik
-      prompt: Would you like to install traefik?
-      private: no
-      default: yes
-    - name: local_storage
-      prompt: Would you like to install local-storage?
-      private: no
-      default: yes
-    - name: metrics_server
-      prompt: Would you like to install metrics-server?
-      private: no
-      default: yes
-  roles:
-    - k3s-master
-- hosts: all:!master
-  roles:
-    - k3s-worker
+    - xanmanning.k3s
+    - k3s
+# - hosts: master
+#   vars_prompt:
+#     - name: externaldatabase
+#       prompt: Would you like to use an external database?
+#       private: no
+#       default: no
+#     - name: coredns
+#       prompt: Would you like to install coredns?
+#       private: no
+#       default: yes
+#     - name: servicelb
+#       prompt: Would you like to install servicelb?
+#       private: no
+#       default: yes
+#     - name: traefik
+#       prompt: Would you like to install traefik?
+#       private: no
+#       default: yes
+#     - name: local_storage
+#       prompt: Would you like to install local-storage?
+#       private: no
+#       default: yes
+#     - name: metrics_server
+#       prompt: Would you like to install metrics-server?
+#       private: no
+#       default: yes
+#   roles:
+#     - k3s-master
+# - hosts: all:!master
+#   roles:
+#     - k3s-worker

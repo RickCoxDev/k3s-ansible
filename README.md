@@ -50,3 +50,6 @@ A standard K3s installation will use Sqlite embedded database. If you wish to us
 
 ### K8s **DEPRECATED**
 When running the K8s installation playbook you are prompted whether to install [Weave](https://www.weave.works/docs/net/latest/overview/) or [Flannel](https://github.com/coreos/flannel) to use as your network between the nodes.
+
+### Thanks
+Inspiration was take from [onedrOp](https://github.com/onedr0p/home-operations)'s ansible project.
