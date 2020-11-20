@@ -1,7 +1,0 @@
-[nodes]
-node01    ansible_host=192.168.1.101
-node02    ansible_host=192.168.1.102
-node03    ansible_host=192.168.1.103
-
-[master]
-node01

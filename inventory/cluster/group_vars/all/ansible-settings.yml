@@ -1,0 +1,5 @@
+---
+
+# Ansible user to ssh into servers with
+ansible_user: "pi"
+ansible_become_pass: "raspberry"
